@@ -33,7 +33,7 @@ const fFps = (p5, dat) => {
 
  
 const fResize = (p5) => {
-  const f = ({ useCss, parent }) => { // resize fn
+  const f = ({ useCss, parent, noRedraw }) => { // resize fn
     const r = p5.width / p5.height; // ratio
     const { width, height } = parent.getBoundingClientRect(); // container dims
     let w = width;
@@ -43,11 +43,16 @@ const fResize = (p5) => {
       w = h * r;
     }
     if (useCss) p5.canvas.style.transform = `scale(${w / p5.width}, ${h / p5.height})`;
-    else p5.resizeCanvas(w, h);
+    else p5.resizeCanvas(w, h, noRedraw);
   };
   let t = null; // debounce timer
-  return ({ useCss = false, parent = p5.canvas.parentElement, delay = 100 } = {}) => {
+  return ({ 
+    useCss = false, 
+    parent = p5.canvas.parentElement, 
+    delay = 100,
+    noRedraw = false,
+  } = {}) => {
     clearTimeout(t);
-    setTimeout(() => f({ useCss, parent }), delay);
+    setTimeout(() => f({ useCss, parent, noRedraw }), delay);
   };
 };
