@@ -53,6 +53,6 @@ const fResize = (p5) => {
     noRedraw = false,
   } = {}) => {
     clearTimeout(t);
-    setTimeout(() => f({ useCss, parent, noRedraw }), delay);
+    t = setTimeout(() => f({ useCss, parent, noRedraw }), delay);
   };
 };
