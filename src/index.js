@@ -33,26 +33,35 @@ const fFps = (p5, dat) => {
 
  
 const fResize = (p5) => {
-  const f = ({ useCss, parent, noRedraw }) => { // resize fn
+  const f = ({ graphics, contain, useCss, noRedraw }) => { // resize fn
     const r = p5.width / p5.height; // ratio
-    const { width, height } = parent.getBoundingClientRect(); // container dims
-    let w = width;
+    let cw = contain.w;
+    let ch = contain.h;
+    if (contain instanceof HTMLElement) {
+      const r = contain.getBoundingClientRect(); // container dims
+      cw = r.width;
+      ch = r.height;
+    }
+    let w = cw;
     let h = w / r;
-    if (h > height) {
-      h = height;
+    if (h > ch) {
+      h = ch;
       w = h * r;
     }
-    if (useCss) p5.canvas.style.transform = `scale(${w / p5.width}, ${h / p5.height})`;
-    else p5.resizeCanvas(w, h, noRedraw);
+    for (const g of graphics) {
+      if (useCss) g.canvas.style.transform = `scale(${w / g.width}, ${h / g.height})`;
+      else g.resizeCanvas(w, h, noRedraw);
+    }
   };
   let t = null; // debounce timer
-  return ({ 
-    useCss = false, 
-    parent = p5.canvas.parentElement, 
-    delay = 100,
-    noRedraw = false,
+  return ({
+    graphics = [p5], // p5.Graphics []
+    contain = p5.canvas.parentElement, // html elm | { w , h }
+    useCss = false, // true=scale by css; false=resize drawing buffer
+    noRedraw = false, // used by `p5.resizeCanvas()`
+    delay = 100, // debounce t in ms
   } = {}) => {
     clearTimeout(t);
-    t = setTimeout(() => f({ useCss, parent, noRedraw }), delay);
+    t = setTimeout(() => f({ graphics, contain, useCss, noRedraw }), delay);
   };
 };
