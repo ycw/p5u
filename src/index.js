@@ -33,7 +33,7 @@ const fFps = (p5, dat) => {
 
  
 const fResize = (p5) => {
-  const f = ({ graphics, contain, useCss, noRedraw }) => { // resize fn
+  const f = ({ graphics, contain, useCss, noRedraw, onResized }) => { // resize fn
     const r = p5.width / p5.height; // ratio
     let cw = contain.w;
     let ch = contain.h;
@@ -52,6 +52,7 @@ const fResize = (p5) => {
       if (useCss) g.canvas.style.transform = `scale(${w / g.width}, ${h / g.height})`;
       else g.resizeCanvas(w, h, noRedraw);
     }
+    onResized?.(); 
   };
   let t = null; // debounce timer
   return ({
@@ -60,8 +61,9 @@ const fResize = (p5) => {
     useCss = false, // true=scale by css; false=resize drawing buffer
     noRedraw = false, // used by `p5.resizeCanvas()`
     delay = 100, // debounce t in ms
+    onResized = null // fn to be called after finishing resize
   } = {}) => {
     clearTimeout(t);
-    t = setTimeout(() => f({ graphics, contain, useCss, noRedraw }), delay);
+    t = setTimeout(() => f({ graphics, contain, useCss, noRedraw, onResized }), delay);
   };
 };
